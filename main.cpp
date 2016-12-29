@@ -28,14 +28,14 @@ void search() {
 
 
 
-    constexpr int threshold = 5;
+    constexpr int threshold = 2;
     constexpr int max_twiddles = 5;
 
 
 
 
     // -------- Configuration ----------
-    constexpr uint8_t KFAST_thresh = 45;
+    constexpr uint8_t KFAST_thresh = 65;
     constexpr char name[] = "test.jpg";
     constexpr float scale_factor = 1.2f;
     constexpr uint8_t scale_levels = 2;
@@ -81,7 +81,7 @@ void search() {
             }
 
     	    // Resize src so that is has the same size as img
-	    cv::resize(testimage, testimage, image.size());
+//	    cv::resize(testimage, testimage, image.size());
 
             // ------------- KORAL -----------
             KORAL koraltwo(scale_factor, scale_levels);
@@ -93,7 +93,7 @@ void search() {
             std::cout << "KORAL two found " << koraltwo.kps.size() << " keypoints and descriptors." << std::endl;
             Matcher<false> m(koraltwo.desc.data(), koraltwo.kps.size(), koral.desc.data(), koral.kps.size(), threshold, max_twiddles);
             m.bruteMatch();
-            std::cout << "matches found: " << m.matches.size() << std::endl;
+            std::cout << "matches found: " << m.matches.size() << " of " << koral.kps.size() <<   std::endl;
 
 
             //Matcher<false> mr(koral.desc.data(), koral.kps.size(), koraltwo.desc.data(), koraltwo.kps.size(), threshold, max_twiddles);
@@ -101,9 +101,12 @@ void search() {
 
             mr.bruteMatch();
 
-            std::cout << "matches reverse found: " << mr.matches.size() << std::endl << std::endl;
-            if(mr.matches.size() >= 2500) {
-                 std::cout << "MATCHED!!!!" << std::endl;
+            std::cout << "matches reverse found: " << mr.matches.size() << " of " << koral.kps.size() <<   std::endl << std::endl;
+
+	    unsigned int m_threshold= (koral.kps.size() * 0.27);
+
+            if( m.matches.size() >=  m_threshold && mr.matches.size() >=  m_threshold ) {
+                 std::cout << "MATCHED!!! threshold is " << m_threshold << std::endl;
 		cv::namedWindow( entry.path().string());// Create a window for display.
 	        cv::imshow( entry.path().string(), testimage );
 		cv::waitKey(0);
