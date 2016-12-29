@@ -12,8 +12,6 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/program_options.hpp>
 
-unsigned int numkps = 200;
-
 
 using namespace std;
 namespace po = boost::program_options;
@@ -30,17 +28,17 @@ void search() {
 
 
 
-    constexpr int threshold = 10;
+    constexpr int threshold = 5;
     constexpr int max_twiddles = 5;
 
 
 
 
     // -------- Configuration ----------
-    constexpr uint8_t KFAST_thresh = 65;
+    constexpr uint8_t KFAST_thresh = 45;
     constexpr char name[] = "test.jpg";
     constexpr float scale_factor = 1.2f;
-    constexpr uint8_t scale_levels = 8;
+    constexpr uint8_t scale_levels = 2;
     // --------------------------------
 
 
@@ -82,7 +80,8 @@ void search() {
                 return;
             }
 
-
+    	    // Resize src so that is has the same size as img
+	    cv::resize(testimage, testimage, image.size());
 
             // ------------- KORAL -----------
             KORAL koraltwo(scale_factor, scale_levels);
@@ -92,11 +91,8 @@ void search() {
 
             // ------------ Output ------------
             std::cout << "KORAL two found " << koraltwo.kps.size() << " keypoints and descriptors." << std::endl;
-
-
             Matcher<false> m(koraltwo.desc.data(), koraltwo.kps.size(), koral.desc.data(), koral.kps.size(), threshold, max_twiddles);
             m.bruteMatch();
-
             std::cout << "matches found: " << m.matches.size() << std::endl;
 
 
@@ -106,117 +102,21 @@ void search() {
             mr.bruteMatch();
 
             std::cout << "matches reverse found: " << mr.matches.size() << std::endl << std::endl;
+            if(mr.matches.size() >= 2500) {
+                 std::cout << "MATCHED!!!!" << std::endl;
+		cv::namedWindow( entry.path().string());// Create a window for display.
+	        cv::imshow( entry.path().string(), testimage );
+		cv::waitKey(0);
+	    }
+
+           std::cout << "-------------------------------------------------------" << std::endl;
+
         }
     }
 
 
 
 
-
-
-
-
-/*
-    std::cout << "First descriptor in first set in KORAL looks like.. " << std::endl;
-    for ( i = 0; i < 64; ++i) std::cout << std::bitset<8>(koral.desc[koral.kps.size()+10]);
-    std::cout << std::endl;
-*/
-
-    // --------------------------------
-
-
-
-    // Initialization of Matcher class
-    // number for vector size size is /64, this is because it needs to know how many descriptors
-
-    /*
-    // -----------------------------------------------------------------------------------
-    std::cout << "---- fastApproxMatch results ----" << std::endl;
-    std::cout << "Warming up..." << std::endl;
-    for (i = 0; i < warmups; ++i) {
-        m.fastApproxMatch();
-        std::cout << ".";
-    }
-    std::cout << std::endl;
-    m.fastApproxMatch();
-    i = 0;
-    if(m.matches.size()) {
-        start = m.matches[0].t;
-        for (auto &&match : m.matches) {
-            if (start == match.t) {
-                i++;
-            } else {
-                std::cout << "Non consecutive reference found at " << match.t << " -> " << start << std::endl;
-            }
-            start++;
-        }
-        if ((unsigned) i == m.matches.size()) {
-            std::cout << i << " consecutive results found" << std::endl;
-        }
-    } else {
-        std::cout << "No matches found" << std::endl;
-    }
-
-    // -----------------------------------------------------------------------------------
-    std::cout << "---- bruteMatch results ----" << std::endl;
-    std::cout << "Warming up..." << std::endl;
-    for (i = 0; i < warmups; ++i) {
-        m.bruteMatch();
-        std::cout << ".";
-    }
-    std::cout << std::endl;
-
-    m.bruteMatch();
-
-    i = 0;
-    i = 0;
-    if(m.matches.size()) {
-
-        start = m.matches[0].t;
-        for (auto &&match : m.matches) {
-            if (start == match.t) {
-                i++;
-            } else {
-                std::cout << "Non consecutive reference found at " << match.t << " -> " << start << std::endl;
-            }
-            start++;
-        }
-        if ((unsigned) i == m.matches.size()) {
-            std::cout << i << " consecutive results found" << std::endl;
-        }
-    } else {
-        std::cout << "No matches found" << std::endl;
-    }
-
-    // -----------------------------------------------------------------------------------
-    std::cout << "---- exactMatch results ----" << std::endl;
-    std::cout << "Warming up..." << std::endl;
-    for (i = 0; i < warmups; ++i) {
-        m.exactMatch();
-        std::cout << ".";
-    }
-    std::cout << std::endl;
-    m.exactMatch();
-    i = 0;
-    if(m.matches.size()) {
-
-        start = m.matches[0].t;
-        for (auto &&match : m.matches) {
-            if (start == match.t) {
-                i++;
-            } else {
-                std::cout << "Non consecutive reference found at " << match.t << " -> " << start << std::endl;
-            }
-            start++;
-        }
-        if ((unsigned) i == m.matches.size()) {
-            std::cout << i << " consecutive results found" << std::endl;
-        }
-
-    } else {
-        std::cout << "No matches found" << std::endl;
-    }
-     */
 }
 
 
