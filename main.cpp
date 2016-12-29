@@ -61,7 +61,7 @@ void search() {
     // --------------------------------
 
 
-    constexpr char path[] = "/tmp/KORAL/images";
+    constexpr char path[] = "./images";
     boost::filesystem::path p(path);
 
 
